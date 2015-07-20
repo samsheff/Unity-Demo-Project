@@ -24,6 +24,7 @@ public class TrapManager : MonoBehaviour {
 		getNumberOfTraps ();
 
 		for (int i=0; i<numberOfTraps; i++) {
+
 			// CALCULATE OFFSET //
 			int trapOffset = 4 + (80 * i);
 
@@ -34,12 +35,12 @@ public class TrapManager : MonoBehaviour {
 			Vector2 CenterCoords = new Vector3(BitConverter.ToInt32 (TrapDB, trapOffset + 6), BitConverter.ToInt32 (TrapDB, trapOffset + 10), 0);
 
 			// TRAP NAME //
-			byte[] TrapName = new byte[62];
+			byte[] TrapNameBytes = new byte[62];
 			for (int c = 14; c < 75; c++) {
-				TrapName[c-14] = TrapDB[trapOffset + c];
+				TrapNameBytes[c-14] = TrapDB[trapOffset + c];
 			}
-;
-			string TrapNameString = System.Text.Encoding.ASCII.GetString(TrapName);
+
+			string TrapName = System.Text.Encoding.ASCII.GetString(TrapNameBytes);
 
 			// EFFECTS //
 			bool Alignment = false;
@@ -52,17 +53,18 @@ public class TrapManager : MonoBehaviour {
 						Alignment = true;
 					}
 				} else {
-					if (EffectsFlags[c] == '1') {
-						Effects[c] = 1;
+					if (EffectsFlags[c-1] == '1') {
+						Effects[c-1] = 1;
 					} else {
-						Effects[c] = -1;
+						Effects[c-1] = -1;
 					}
 				}
 			}
 
 
 			// INSTANTIATION //
-			GameObject trap = new GameObject();
+			GameObject trap = null;
+
 			if (TrapType == 0) {
 				trap = (GameObject) Instantiate(CircleTrap, CenterCoords, Quaternion.identity);
 			} else if (TrapType == 1) {
@@ -71,17 +73,18 @@ public class TrapManager : MonoBehaviour {
 
 			// TRAP SETUP //
 			trap.GetComponent<Trap>().TrapID = TrapID;
-			trap.GetComponent<Trap>().TrapName = TrapNameString;
+			trap.GetComponent<Trap>().TrapName = TrapName;
 
 			trap.GetComponent<Trap>().EffectAlignment = Alignment;
 			trap.GetComponent<Trap>().Effects = Effects;
 
 			trap.transform.localScale = new Vector3(TrapSize, TrapSize, TrapSize);
+
+			trap.name = TrapName;
 		}
 	}
 
 	void getNumberOfTraps() {
 		numberOfTraps = (UInt32) BitConverter.ToUInt32 (TrapDB, 0);
-		print (numberOfTraps.ToString ());
 	}
 }

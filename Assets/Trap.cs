@@ -14,7 +14,7 @@ public class Trap : MonoBehaviour {
 		if (hasConflictingEffects(col.gameObject.GetComponent<Trap>().Effects)) {
 			GetComponent<SpriteRenderer> ().color = Color.red;
 
-			print ("Conflicting trap with ID: " + TrapID);
+			print ("Conflicting trap with name: " + TrapName);
 		}
 	}
 
